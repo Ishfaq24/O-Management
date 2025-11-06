@@ -122,7 +122,7 @@ const ProjectReports = () => {
     <div className="p-6 min-h-screen bg-gradient-to-br from-green-50 via-white to-green-100">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
+        <h1 className="text-3xl font-bold text-black-700 flex items-center gap-2">
           <FaChartLine /> Project Reports
         </h1>
 

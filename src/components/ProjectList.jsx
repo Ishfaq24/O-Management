@@ -182,7 +182,7 @@ const ProjectList = () => {
   return (
     <div className="p-6 min-h-screen bg-gradient-to-br from-green-50 via-white to-green-100">
       <div className="flex flex-wrap justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Projects</h1>
+        <h1 className="text-3xl mb-6 font-bold text-black-700">Projects</h1>
         {isAdmin && (
           <div className="flex gap-3">
             <motion.button
