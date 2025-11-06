@@ -147,36 +147,14 @@ const Navbar = ({ session, setSession }) => {
               Products
             </button>
 
-            {/* Users Dropdown */}
-            <div ref={usersRef} className="relative">
-              <button
-                onClick={() => setUsersOpen(!usersOpen)}
-                className="flex items-center space-x-1 hover:text-emerald-300 transition-colors cursor-pointer"
-              >
-                <span>Users</span>
-                <FaChevronDown
-                  className={`text-sm transition-transform duration-300 ${usersOpen ? "rotate-180" : ""}`}
-                />
-              </button>
-              <div
-                className={`absolute mt-2 w-44 bg-emerald-600 rounded-lg shadow-lg z-50 origin-top transition-all duration-300 ease-in-out transform ${
-                  usersOpen ? "scale-100 opacity-100 visible" : "scale-95 opacity-0 invisible"
-                }`}
-              >
-                <button
-                  onClick={() => handleNav("/users")}
-                  className="block w-full text-left px-4 py-2 hover:bg-emerald-500 transition cursor-pointer rounded-t-lg"
-                >
-                  All Users
-                </button>
-                <button
-                  onClick={() => handleNav("/users/add")}
-                  className="block w-full text-left px-4 py-2 hover:bg-emerald-500 transition cursor-pointer rounded-b-lg"
-                >
-                  Add User
-                </button>
-              </div>
-            </div>
+            <button
+              onClick={() => handleNav("/notifications")}
+              className={`transition-colors cursor-pointer ${
+                isActive("/notifications") ? "underline decoration-2 decoration-emerald-200" : "hover:text-emerald-300"
+              }`}
+            >
+              Notifications
+            </button>
 
             <button
               onClick={() => handleNav("/attendance")}

@@ -25,7 +25,6 @@ const AttendanceList = ({ isAdmin }) => {
     setTimeout(() => setToast(null), 3000);
   };
 
-  // Fetch logged-in user
   const fetchUser = async () => {
     try {
       const { data, error } = await supabase.auth.getUser();
@@ -42,7 +41,9 @@ const AttendanceList = ({ isAdmin }) => {
         .single();
 
       if (!profile) {
-        await supabase.from("profiles").insert([{ id, full_name: data.user.email }]);
+        await supabase
+          .from("profiles")
+          .insert([{ id, full_name: data.user.email }]);
       }
     } catch (err) {
       console.error(err);
@@ -50,10 +51,11 @@ const AttendanceList = ({ isAdmin }) => {
     }
   };
 
-  // Fetch all profiles
   const fetchProfiles = async () => {
     try {
-      const { data, error } = await supabase.from("profiles").select("id, full_name");
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name");
       if (error) throw error;
       setProfiles(data || []);
     } catch (err) {
@@ -62,35 +64,43 @@ const AttendanceList = ({ isAdmin }) => {
     }
   };
 
-  // Fetch attendance
-  const fetchAttendance = async () => {
-    if (!userId && !isAdmin) return;
-    setLoading(true);
+const fetchAttendance = async () => {
+  setLoading(true);
 
-    try {
-      const { data, error } = await supabase
-        .from("attendance")
-        .select("*")
-        .order("date", { ascending: false });
+  try {
+    const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+    let query = supabase
+      .from("attendance")
+      .select("*")
+      .gte("check_in", `${today}T00:00:00Z`)
+      .lte("check_in", `${today}T23:59:59Z`)
+      .order("check_in", { ascending: false });
 
-      if (error) throw error;
-
-      const mappedData = data.map((att) => {
-        const profile = profiles.find((p) => p.id === att.user_id);
-        return {
-          ...att,
-          full_name: profile?.full_name || "Unknown",
-        };
-      });
-
-      setAttendance(isAdmin ? mappedData : mappedData.filter((a) => a.user_id === userId));
-    } catch (err) {
-      console.error(err);
-      showToast("Error fetching attendance", "error");
-    } finally {
-      setLoading(false);
+    // For regular users, filter by their userId
+    if (!isAdmin && userId) {
+      query = query.eq("user_id", userId);
     }
-  };
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    const mappedData = data.map((att) => {
+      const profile = profiles.find((p) => p.id === att.user_id);
+      return {
+        ...att,
+        full_name: profile?.full_name || "Unknown",
+      };
+    });
+
+    setAttendance(mappedData);
+  } catch (err) {
+    console.error(err);
+    showToast("Error fetching attendance", "error");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     fetchUser();
@@ -106,17 +116,18 @@ const AttendanceList = ({ isAdmin }) => {
     const today = new Date().toISOString().split("T")[0];
 
     try {
-      const { data } = await supabase
+      const { data: existing, error } = await supabase
         .from("attendance")
         .select("*")
         .eq("user_id", userId)
-        .eq("date", today)
-        .maybeSingle();
+        .gte("check_in", `${today}T00:00:00Z`)
+        .lte("check_in", `${today}T23:59:59Z`)
+        .single();
 
-      if (data) return showToast("You have already checked in today!", "error");
+      if (existing) return showToast("You have already checked in today!", "error");
 
       setLoading(true);
-      const { error } = await supabase.from("attendance").insert([
+      const { error: insertError } = await supabase.from("attendance").insert([
         {
           user_id: userId,
           check_in: new Date().toISOString(),
@@ -124,7 +135,7 @@ const AttendanceList = ({ isAdmin }) => {
         },
       ]);
 
-      if (error) throw error;
+      if (insertError) throw insertError;
 
       fetchAttendance();
       showToast("Checked in successfully!");
@@ -191,13 +202,14 @@ const AttendanceList = ({ isAdmin }) => {
             <th className="border p-2">Check-In</th>
             <th className="border p-2">Check-Out</th>
             <th className="border p-2">Note</th>
+            {!isAdmin && <th className="border p-2">Action</th>}
           </tr>
         </thead>
         <tbody>
           {attendance.map((att) => (
             <tr key={att.id} className="hover:bg-green-50">
               <td className="border p-2">{att.full_name}</td>
-              <td className="border p-2">{att.date ? new Date(att.date).toLocaleDateString() : "-"}</td>
+              <td className="border p-2">{att.check_in ? new Date(att.check_in).toLocaleDateString() : "-"}</td>
               <td className="border p-2">{att.check_in ? new Date(att.check_in).toLocaleTimeString() : "-"}</td>
               <td className="border p-2">{att.check_out ? new Date(att.check_out).toLocaleTimeString() : "-"}</td>
               <td className="border p-2">{att.note || "-"}</td>

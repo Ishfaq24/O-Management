@@ -14,6 +14,7 @@ import ProjectStatistics from './pages/ProjectStatics.jsx';
 import ProductServices from './pages/ProductServices.jsx';
 import Attendance from './components/AttendanceList.jsx';
 import Notfound from './pages/Notfound.jsx';
+import NotificationList from './components/NotificationList.jsx';
 
 const App = () => {
   const [session, setSession] = useState(null);
@@ -70,6 +71,10 @@ const App = () => {
         <Route
           path="/products"
           element={session ? <ProductServices /> : <Navigate to="/signin" replace />}
+        />
+        <Route
+          path="/notifications"
+          element={session ? <NotificationList /> : <Navigate to="/signin" replace />}
         />
         <Route
           path="/attendance"
