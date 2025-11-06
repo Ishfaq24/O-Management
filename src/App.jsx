@@ -15,6 +15,7 @@ import ProductServices from './pages/ProductServices.jsx';
 import Attendance from './components/AttendanceList.jsx';
 import Notfound from './pages/Notfound.jsx';
 import NotificationList from './components/NotificationList.jsx';
+import Footer from './components/Footer.jsx';
 
 const App = () => {
   const [session, setSession] = useState(null);
@@ -83,6 +84,7 @@ const App = () => {
         {/* 404 Page */}
         <Route path="*" element={<Notfound />} />
       </Routes>
+      <Footer />
     </>
   );
 };

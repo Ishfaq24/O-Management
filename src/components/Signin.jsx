@@ -67,7 +67,7 @@ const Signin = () => {
             placeholder="Email Address"
             value={formData.email}
             onChange={handleChange}
-            className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+            className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent transition"
             required
           />
         </div>
@@ -79,7 +79,7 @@ const Signin = () => {
             placeholder="Password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+            className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent transition"
             required
           />
         </div>
@@ -87,7 +87,10 @@ const Signin = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 rounded-xl hover:from-blue-600 hover:to-purple-600 shadow-lg transition"
+          className={`w-full py-3 rounded-xl text-white font-semibold shadow-lg transition 
+          bg-gradient-to-r from-green-500 to-green-600 
+          hover:from-green-600 hover:to-green-700
+          ${loading ? "opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
         >
           {loading ? 'Signing in...' : 'Sign In'}
         </button>
@@ -95,7 +98,7 @@ const Signin = () => {
         <p className="text-sm text-center mt-6 text-gray-600">
           Don’t have an account?{' '}
           <span
-            className="text-blue-500 font-semibold cursor-pointer hover:underline"
+            className="text-green-500 font-semibold cursor-pointer hover:underline"
             onClick={() => navigate('/signup')}
           >
             Sign Up
