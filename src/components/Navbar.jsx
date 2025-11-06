@@ -265,36 +265,15 @@ const Navbar = ({ session, setSession }) => {
           Products
         </button>
 
-        {/* Users */}
-        <div className="border-t border-emerald-500">
-          <button
-            onClick={() => setMobileUsersOpen(!mobileUsersOpen)}
-            className="w-full flex justify-between items-center px-4 py-2 hover:bg-emerald-500 transition cursor-pointer"
-          >
-            <span>Users</span>
-            <FaChevronDown
-              className={`transition-transform duration-300 ${mobileUsersOpen ? "rotate-180" : ""}`}
-            />
-          </button>
-          <div
-            className={`bg-emerald-500 overflow-hidden transition-all duration-300 ease-in-out ${
-              mobileUsersOpen ? "max-h-28 opacity-100" : "max-h-0 opacity-0"
-            } rounded-b-lg`}
-          >
-            <button
-              onClick={() => handleNav("/users")}
-              className="block w-full text-left px-6 py-2 hover:bg-emerald-400 transition cursor-pointer rounded-t-lg"
-            >
-              All Users
-            </button>
-            <button
-              onClick={() => handleNav("/users/add")}
-              className="block w-full text-left px-6 py-2 hover:bg-emerald-400 transition cursor-pointer rounded-b-lg"
-            >
-              Add User
-            </button>
-          </div>
-        </div>
+        {/* Notification */}
+        <button
+          onClick={() => handleNav("/notifications")}
+          className={`block w-full text-left px-4 py-2 hover:bg-emerald-500 border-t border-emerald-500 transition cursor-pointer ${
+            isActive("/notifications") ? "bg-emerald-500" : ""
+          }`}
+        >
+          Notifications
+        </button>
 
         {/* Attendance */}
         <button

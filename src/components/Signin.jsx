@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { supabase } from "../lib/supabaseClient";
+import { useNavigate } from "react-router-dom";
 
 const Signin = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -15,7 +15,7 @@ const Signin = () => {
   const handleSignin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage('');
+    setMessage("");
 
     const { email, password } = formData;
     // eslint-disable-next-line no-unused-vars
@@ -30,9 +30,9 @@ const Signin = () => {
       return;
     }
 
-    setMessage('Login successful! Redirecting...');
+    setMessage("Login successful! Redirecting...");
     setTimeout(() => {
-      navigate('/dashboard');
+      navigate("/dashboard");
     }, 1000);
 
     setLoading(false);
@@ -51,9 +51,9 @@ const Signin = () => {
         {message && (
           <div
             className={`mb-4 text-center px-3 py-2 rounded-lg ${
-              message.includes('successful')
-                ? 'bg-green-100 text-green-700'
-                : 'bg-red-100 text-red-700'
+              message.includes("successful")
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
             }`}
           >
             {message}
@@ -67,7 +67,7 @@ const Signin = () => {
             placeholder="Email Address"
             value={formData.email}
             onChange={handleChange}
-            className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+            className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent transition"
             required
           />
         </div>
@@ -79,7 +79,7 @@ const Signin = () => {
             placeholder="Password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+            className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-transparent transition"
             required
           />
         </div>
@@ -87,16 +87,19 @@ const Signin = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white py-3 rounded-xl hover:from-blue-600 hover:to-purple-600 shadow-lg transition"
+          className={`w-full py-3 rounded-xl text-white font-semibold shadow-lg transition 
+          bg-gradient-to-r from-green-500 to-green-600 
+       hover:from-green-600 hover:to-green-700
+      ${loading ? "opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
         >
-          {loading ? 'Signing in...' : 'Sign In'}
+          {loading ? "Signing in..." : "Sign In"}
         </button>
 
         <p className="text-sm text-center mt-6 text-gray-600">
-          Don’t have an account?{' '}
+          Don’t have an account?{" "}
           <span
-            className="text-blue-500 font-semibold cursor-pointer hover:underline"
-            onClick={() => navigate('/signup')}
+            className="text-green-500 font-semibold cursor-pointer hover:underline"
+            onClick={() => navigate("/signup")}
           >
             Sign Up
           </span>
