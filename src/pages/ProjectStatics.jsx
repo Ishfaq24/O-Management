@@ -142,7 +142,7 @@ const ProjectStatistics = () => {
 
   return (
     <div className="p-6 min-h-screen bg-gradient-to-br from-green-50 via-white to-green-100">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Project Statistics</h1>
+      <h1 className="text-3xl font-bold text-black-700 mb-6">Project Statistics</h1>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

@@ -61,7 +61,7 @@ const ProductServices = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-gradient-to-br from-green-50 via-white to-green-100 min-h-screen">
-      <h1 className="text-4xl font-bold mb-10 text-gray-800 text-center">Our Product Services</h1>
+      <h1 className="text-3xl font-bold mb-6 text-black-700">Our Product Services</h1>
 
       {/* Admin Add Service Panel */}
       {role === 'admin' && (

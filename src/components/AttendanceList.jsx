@@ -68,12 +68,15 @@ const fetchAttendance = async () => {
   setLoading(true);
 
   try {
-    const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999).toISOString();
+
     let query = supabase
       .from("attendance")
       .select("*")
-      .gte("check_in", `${today}T00:00:00Z`)
-      .lte("check_in", `${today}T23:59:59Z`)
+      .gte("check_in", startOfDay)
+      .lte("check_in", endOfDay)
       .order("check_in", { ascending: false });
 
     // For regular users, filter by their userId
@@ -122,8 +125,9 @@ const fetchAttendance = async () => {
         .eq("user_id", userId)
         .gte("check_in", `${today}T00:00:00Z`)
         .lte("check_in", `${today}T23:59:59Z`)
-        .single();
+        .maybeSingle();
 
+      if (error) throw error;  
       if (existing) return showToast("You have already checked in today!", "error");
 
       setLoading(true);
@@ -170,7 +174,7 @@ const fetchAttendance = async () => {
   return (
     <div className="p-6 bg-white rounded shadow-md">
       {toast && <Toast message={toast.message} type={toast.type} />}
-      <h2 className="text-3xl font-bold mb-6 text-green-600">Attendance Sheet</h2>
+      <h2 className="text-3xl font-semibold mb-6 text-black-700">Attendance Sheet</h2>
 
       {!isAdmin && (
         <div className="mb-6">
