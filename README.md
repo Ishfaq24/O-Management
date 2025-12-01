@@ -101,94 +101,113 @@ avatar_url text,
 created_at timestamptz default now()
 );
 
+projects
+create table projects (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  description text,
+  status text default 'active',
+  start_date date,
+  end_date date,
+  manager_id uuid references profiles(id),
+  created_at timestamptz default now()
+);
+
+attendance
+create table attendance (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references profiles(id) on delete cascade,
+  check_in timestamptz,
+  check_out timestamptz,
+  date date default (now()::date),
+  note text,
+  created_at timestamptz default now()
+);
+
+project_assignments
+create table project_assignments (
+  id uuid primary key default gen_random_uuid(),
+  project_id uuid references projects(id) on delete cascade,
+  user_id uuid references profiles(id) on delete cascade,
+  role text,
+  created_at timestamptz default now()
+);
 
 
 
-🧪 Tech Stack
-Frontend
+```
+## 🧪 Tech Stack
 
-React + Vite
+### **Frontend**
+- ⚛️ React + Vite  
+- 🎨 Tailwind CSS  
+- 🌼 DaisyUI  
+- 🎛️ Shadcn UI  
+- 🔀 React Router DOM  
+- 🔧 Lucide Icons  
 
-Tailwind CSS
+### **Backend / Database**
+- 🗄️ Supabase PostgreSQL  
+- 🔐 Supabase Auth  
+- 🛡️ Row Level Security (RLS) Policies  
+- ⚡ Realtime Queries  
 
-DaisyUI
+### **Authentication**
+- 🔑 Clerk Authentication  
+- 🔄 Clerk → Supabase Profile Sync  
 
-Shadcn UI
 
-React Router DOM
+## ▶️ Installation & Setup
 
-Lucide Icons
-
-Backend / Database
-
-Supabase PostgreSQL
-
-Supabase Auth
-
-RLS Policies
-
-Realtime Queries
-
-Authentication
-
-Clerk Authentication
-
-Clerk → Supabase Profile Sync
-
-📸 Screenshots (Add yours)
-/screenshots/login.png
-/screenshots/dashboard.png
-/screenshots/attendance.png
-/screenshots/projects.png
-
-▶️ Installation & Setup
-1️⃣ Clone the repo
-git clone https://github.com/your-username/office-management-system.git
+### 1️⃣ Clone the repository
+```sh
+git clone https://github.com/ishfaq24/office-management-system.git
 cd office-management-system
+
+
 
 2️⃣ Install dependencies
 npm install
 
-3️⃣ Add environment variables
+3️⃣ Configure environment variables
 
-Create a .env.local file:
+Create a .env.local file in the project root:
 
 VITE_SUPABASE_URL=your_url
 VITE_SUPABASE_ANON_KEY=your_key
 VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 VITE_CLERK_SECRET_KEY=your_clerk_secret
 
-4️⃣ Start development server
+4️⃣ Start the development server
 npm run dev
 
 📁 Folder Structure
-/src
-  /components
-  /pages
-  /hooks
-  /lib
-  /context
-  App.jsx
-  main.jsx
+src/
+ ├── components/
+ ├── pages/
+ ├── hooks/
+ ├── lib/
+ ├── context/
+ ├── App.jsx
+ └── main.jsx
 
 🚀 Future Enhancements
 
-Attendance analytics dashboard
+📊 Attendance analytics dashboard
 
-Task management inside projects
+📌 Task management within projects
 
-Payroll automation
+💰 Payroll automation
 
-Leave application & approval workflow
+📝 Leave application & approval workflow
 
-Email & push notifications
+📩 Email & push notifications
 
-Export attendance to CSV or PDF
+📤 Export attendance to CSV or PDF
 
-Advanced role-based protected routes
+🛡️ Advanced role-based protected routes
 
 🤝 Contributing
 
 Pull requests are welcome!
-Please open an issue before making major changes.
-
+Please open an issue first to discuss any major changes.
