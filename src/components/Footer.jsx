@@ -1,61 +1,102 @@
+import React from "react";
+import { Globe, Twitter, Linkedin, Github, Mail } from "lucide-react";
+
 const Footer = () => {
   return (
-    <footer className="relative bg-gradient-to-r bg-emerald-700 text-white mt-16">
-      {/* Wave Top */}
-      <div className="absolute top-0 left-0 w-full overflow-hidden leading-[0] rotate-180">
-        <svg
-          className="relative block w-full h-12"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1200 120"
-          preserveAspectRatio="none"
-        >
-          <path
-            d="M0,0V46.29c47.29,22.39,104.73,29.14,158,12C250.34,38.6,314,0,376,0s125.66,38.6,197.84,58.28c69.87,19.26,139.61,18.57,209.76-1.09C875.34,36,945.61,0,1016,0s125.66,36,184,46.29V0Z"
-            fill="white"
-          />
-        </svg>
-      </div>
+    <footer className="bg-emerald-950 text-emerald-100">
+      {/* Soft Top Divider */}
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
 
-      <div className="max-w-7xl mx-auto px-6 py-16 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          
-          {/* About Section */}
+      <div className="max-w-7xl mx-auto px-6 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+          {/* Brand */}
           <div>
-            <h3 className="text-2xl font-bold mb-3">HackHub_24</h3>
-            <p className="text-gray-100 leading-relaxed">
-              Empowering developers with resources, projects, and community events.
-              Join us and take your coding skills to the next level!
+            <h2 className="text-2xl font-bold text-white mb-3">
+              HackHub<span className="text-emerald-400">_24</span>
+            </h2>
+            <p className="text-sm leading-relaxed text-emerald-200/80">
+              HackHub empowers developers and startups with real-world
+              projects, learning resources, and a strong tech community.
             </p>
           </div>
-          
-          {/* Quick Links */}
+
+          {/* Platform */}
           <div>
-            <h3 className="text-2xl font-bold mb-3">Quick Links</h3>
-            <ul>
-              <li className="hover:text-green-200 transition cursor-pointer my-1">Dashboard</li>
-              <li className="hover:text-green-200 transition cursor-pointer my-1">Employees</li>
-              <li className="hover:text-green-200 transition cursor-pointer my-1">Projects</li>
-              <li className="hover:text-green-200 transition cursor-pointer my-1">Products</li>
+            <h3 className="text-sm font-semibold text-emerald-300 mb-4 uppercase tracking-wider">
+              Platform
+            </h3>
+            <ul className="space-y-2 text-sm">
+              {["Dashboard", "Projects", "Services", "AI Tutor"].map(
+                (item) => (
+                  <li
+                    key={item}
+                    className="hover:text-emerald-400 cursor-pointer transition"
+                  >
+                    {item}
+                  </li>
+                )
+              )}
             </ul>
           </div>
-          
-          {/* Contact / Socials */}
+
+          {/* Company */}
           <div>
-            <h3 className="text-2xl font-bold mb-3">Connect With Us</h3>
-            <p>Email: <span className="text-gray-100">contact@hackhub24.com</span></p>
-            <div className="flex space-x-4 mt-3 text-xl">
-              <a href="#" className="hover:text-green-200 transition transform hover:scale-110">🌐</a>
-              <a href="#" className="hover:text-green-200 transition transform hover:scale-110">🐦</a>
-              <a href="#" className="hover:text-green-200 transition transform hover:scale-110">💼</a>
-              <a href="#" className="hover:text-green-200 transition transform hover:scale-110">📘</a>
-            </div>
+            <h3 className="text-sm font-semibold text-emerald-300 mb-4 uppercase tracking-wider">
+              Company
+            </h3>
+            <ul className="space-y-2 text-sm">
+              {["About", "Community", "Careers", "Contact"].map(
+                (item) => (
+                  <li
+                    key={item}
+                    className="hover:text-emerald-400 cursor-pointer transition"
+                  >
+                    {item}
+                  </li>
+                )
+              )}
+            </ul>
           </div>
 
+          {/* Connect */}
+          <div>
+            <h3 className="text-sm font-semibold text-emerald-300 mb-4 uppercase tracking-wider">
+              Connect
+            </h3>
+
+            <div className="flex items-center gap-3 mb-4 text-sm">
+              <Mail size={16} />
+              <span>hackhub24.dev@gmail.com</span>
+            </div>
+
+            <div className="flex gap-3">
+              {[Globe, Twitter, Linkedin, Github].map((Icon, i) => (
+                <a
+                  key={i}
+                  href="#"
+                  className="p-2 rounded-lg bg-emerald-900 hover:bg-emerald-800 hover:text-emerald-400 transition"
+                >
+                  <Icon size={18} />
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Bottom */}
-        <div className="mt-16 border-t border-green-400 pt-4 text-center text-gray-200 text-sm">
-          &copy; {new Date().getFullYear()} HackHub_24. All rights reserved.
+        <div className="mt-14 pt-6 border-t border-emerald-900 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-emerald-300/80">
+          <span>
+            © {new Date().getFullYear()} HackHub_24. All rights reserved.
+          </span>
+
+          <div className="flex gap-4">
+            <span className="hover:text-emerald-400 cursor-pointer transition">
+              Privacy
+            </span>
+            <span className="hover:text-emerald-400 cursor-pointer transition">
+              Terms
+            </span>
+          </div>
         </div>
       </div>
     </footer>

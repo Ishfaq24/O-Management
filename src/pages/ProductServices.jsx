@@ -1,113 +1,247 @@
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { supabase } from '../lib/supabaseClient';
-import { FaLaptopCode, FaMobileAlt, FaServer, FaShoppingCart } from 'react-icons/fa';
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { supabase } from "../lib/supabaseClient";
+import {
+  FaLaptopCode,
+  FaMobileAlt,
+  FaServer,
+  FaShoppingCart,
+  FaCloud,
+  FaBrain,
+  FaUsers,
+  FaChalkboardTeacher,
+  FaShieldAlt,
+  FaRocket,
+  FaPlus,
+} from "react-icons/fa";
+
+/* ================= DEFAULT SERVICES ================= */
+
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80";
 
 const defaultServices = [
-  { id: '1', name: 'Web Development', description: 'Custom responsive websites tailored to your needs.', icon: <FaLaptopCode /> },
-  { id: '2', name: 'Mobile App Development', description: 'iOS and Android apps with modern UI/UX.', icon: <FaMobileAlt /> },
-  { id: '3', name: 'API Integration', description: 'Seamless integration with third-party APIs.', icon: <FaServer /> },
-  { id: '4', name: 'E-commerce Solutions', description: 'Full-fledged online stores with payment integration.', icon: <FaShoppingCart /> },
+  {
+    id: "1",
+    name: "Full-Stack Web Development",
+    description:
+      "Scalable, secure, high-performance web applications using modern stacks.",
+    icon: <FaLaptopCode />,
+    tag: "Popular",
+    image:
+      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "2",
+    name: "Mobile App Development",
+    description:
+      "Cross-platform Android & iOS apps with delightful UX and performance.",
+    icon: <FaMobileAlt />,
+    tag: "Trending",
+    image:
+      "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "3",
+    name: "Backend & API Engineering",
+    description:
+      "Secure, scalable REST & GraphQL APIs with real-world architecture.",
+    icon: <FaServer />,
+    tag: "Core",
+    image:
+      "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "4",
+    name: "E-commerce Solutions",
+    description:
+      "End-to-end stores with secure payments, dashboards & analytics.",
+    icon: <FaShoppingCart />,
+    tag: "Business",
+    image:
+      "https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "5",
+    name: "Cloud & DevOps",
+    description:
+      "CI/CD pipelines, cloud deployment, monitoring & scalability.",
+    icon: <FaCloud />,
+    tag: "Pro",
+    image:
+      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "6",
+    name: "AI / ML Solutions",
+    description:
+      "AI-powered chatbots, recommendation systems & automation.",
+    icon: <FaBrain />,
+    tag: "Future",
+    image:
+      "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=1200&q=80",
+  },
 ];
+
+/* ================= COMPONENT ================= */
 
 const ProductServices = () => {
   const [services, setServices] = useState([]);
-  const [newService, setNewService] = useState({ name: '', description: '' });
+  const [newService, setNewService] = useState({ name: "", description: "" });
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch user role
+  /* ===== Fetch user role ===== */
   useEffect(() => {
     const fetchUserRole = async () => {
       const { data: { user } } = await supabase.auth.getUser();
+
       if (!user) {
-        setRole('employee');
+        setRole("employee");
         setLoading(false);
         return;
       }
-      const { data, error } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-      if (error) console.error(error);
-      else setRole(data.role);
+
+      const { data } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+      setRole(data?.role || "employee");
       setLoading(false);
     };
+
     fetchUserRole();
   }, []);
 
-  // Fetch services from Supabase
+  /* ===== Fetch services ===== */
   useEffect(() => {
     const fetchServices = async () => {
-      const { data, error } = await supabase.from('product_services').select('*');
-      if (error) console.error(error);
-      else setServices(data.length ? data : defaultServices);
+      const { data } = await supabase.from("product_services").select("*");
+      setServices(data?.length ? data : defaultServices);
     };
+
     fetchServices();
   }, []);
 
+  /* ===== Add service (Admin only) ===== */
   const handleAddService = async () => {
     if (!newService.name || !newService.description) return;
 
-    const { data, error } = await supabase
-      .from('product_services')
-      .insert([{ name: newService.name, description: newService.description }])
+    const { data } = await supabase
+      .from("product_services")
+      .insert([newService])
       .select();
 
-    if (error) console.error(error);
-    else setServices([...services, data[0] || { ...newService, id: Date.now(), icon: <FaLaptopCode /> }]);
+    if (data) {
+      setServices([
+        ...services,
+        {
+          ...data[0],
+          icon: <FaRocket />,
+          tag: "Custom",
+          image: FALLBACK_IMAGE,
+        },
+      ]);
+    }
 
-    setNewService({ name: '', description: '' });
+    setNewService({ name: "", description: "" });
   };
 
-  if (loading) return <div className="p-6 text-center text-gray-500">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="py-20 text-center text-gray-500">Loading services…</div>
+    );
+  }
 
   return (
-    <div className="max-w-7xl mx-auto p-6 bg-gradient-to-br from-green-50 via-white to-green-100 min-h-screen">
-      <h1 className="text-3xl font-bold mb-6 text-black-700">Our Product Services</h1>
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-emerald-100 py-20 px-6">
+      {/* ===== Header ===== */}
+      <div className="max-w-4xl mx-auto text-center mb-20">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-emerald-900  mb-4">
+          What HackHub Builds 🚀
+        </h1>
+        <p className="text-lg text-gray-600">
+          Production-grade software, AI systems, and platforms trusted by
+          startups, students, and tech communities.
+        </p>
+      </div>
 
-      {/* Admin Add Service Panel */}
-      {role === 'admin' && (
-        <div className="mb-10 border p-6 rounded-2xl shadow-md bg-white">
-          <h2 className="text-2xl font-semibold mb-4 text-gray-700">Add New Service</h2>
-          <div className="flex flex-col md:flex-row gap-4 items-center">
+      {/* ===== Admin Panel ===== */}
+      {role === "admin" && (
+        <div className="max-w-5xl mx-auto mb-16 backdrop-blur-xl bg-white/70 border border-emerald-200 rounded-3xl p-8 shadow-lg">
+          <h2 className="text-xl font-bold text-gray-800 mb-6">
+            Admin · Add New Service
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-4">
             <input
-              type="text"
-              placeholder="Service Name"
-              className="border p-3 rounded w-full md:w-1/3 focus:outline-none focus:ring-2 focus:ring-green-400"
+              placeholder="Service name"
+              className="rounded-xl border p-4 focus:ring-2 focus:ring-emerald-400"
               value={newService.name}
-              onChange={(e) => setNewService({ ...newService, name: e.target.value })}
+              onChange={(e) =>
+                setNewService({ ...newService, name: e.target.value })
+              }
             />
             <input
-              type="text"
-              placeholder="Service Description"
-              className="border p-3 rounded w-full md:w-2/3 focus:outline-none focus:ring-2 focus:ring-green-400"
+              placeholder="Service description"
+              className="rounded-xl border p-4 focus:ring-2 focus:ring-emerald-400 md:col-span-2"
               value={newService.description}
-              onChange={(e) => setNewService({ ...newService, description: e.target.value })}
+              onChange={(e) =>
+                setNewService({ ...newService, description: e.target.value })
+              }
             />
             <button
-              className="bg-green-500 text-white px-6 py-3 rounded hover:bg-green-600 transition font-semibold"
               onClick={handleAddService}
+              className="md:col-span-3 mt-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl py-3 font-semibold flex items-center justify-center gap-2"
             >
-              Add Service
+              <FaPlus /> Add Service
             </button>
           </div>
         </div>
       )}
 
-      {/* Services Grid */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {services.map((service, index) => (
+      {/* ===== Services Grid ===== */}
+      <div className="max-w-7xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
+        {services.map((service, i) => (
           <motion.div
-            key={service.id || index}
-            whileHover={{ scale: 1.05 }}
-            className="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition cursor-pointer flex flex-col justify-between"
+            key={service.id || i}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.08 }}
+            whileHover={{ y: -8 }}
+            className="group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition"
           >
-            <div className="flex items-center gap-4 mb-4 text-green-600 text-3xl">
-              {service.icon || <FaLaptopCode />}
-              <h3 className="text-2xl font-bold">{service.name}</h3>
+            {/* Image */}
+            <div className="relative h-44">
+              <img
+                src={service.image}
+                alt={service.name}
+                loading="lazy"
+                className="h-full w-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = FALLBACK_IMAGE;
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+              <span className="absolute top-4 left-4 bg-white/90 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold">
+                {service.tag || "HackHub"}
+              </span>
             </div>
-            <p className="text-gray-700 mb-4">{service.description}</p>
-            <span className="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
-              Featured
-            </span>
+
+            {/* Content */}
+            <div className="p-6">
+              <div className="flex items-center gap-3 text-emerald-600 text-2xl mb-3">
+                {service.icon || <FaLaptopCode />}
+                <h3 className="text-xl font-bold text-gray-900">
+                  {service.name}
+                </h3>
+              </div>
+              <p className="text-gray-600 leading-relaxed">
+                {service.description}
+              </p>
+            </div>
           </motion.div>
         ))}
       </div>

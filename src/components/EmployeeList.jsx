@@ -35,8 +35,8 @@ const EmployeeList = () => {
     <div className="min-h-screen bg-gradient-to-br p-8 rounded-xl transition-all">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <h2 className="text-3xl font-bold mb-6 text-black-700 flex items-center gap-2">
-          <FaUsers className="text-green-600" /> Employees
+        <h2 className="text-3xl font-bold mb-6 text-emerald-900 flex items-center gap-2">
+          <FaUsers className="text-green-900" /> Employees
         </h2>
 
         <div className="flex items-center gap-3 w-full md:w-auto">

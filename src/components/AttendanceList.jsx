@@ -4,9 +4,9 @@ import { supabase } from "../lib/supabaseClient.js";
 
 const Toast = ({ message, type }) => (
   <div
-    className={`fixed top-5 right-5 px-4 py-2 rounded shadow-md text-white transition ${
-      type === "success" ? "bg-green-600" : "bg-red-600"
-    }`}
+    className={`fixed top-5 right-5 z-50 px-5 py-3 rounded-lg shadow-xl text-white text-sm font-medium
+      animate-slide-in
+      ${type === "success" ? "bg-emerald-600" : "bg-rose-600"}`}
   >
     {message}
   </div>
@@ -45,8 +45,7 @@ const AttendanceList = ({ isAdmin }) => {
           .from("profiles")
           .insert([{ id, full_name: data.user.email }]);
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
       showToast("Error fetching user", "error");
     }
   };
@@ -58,52 +57,42 @@ const AttendanceList = ({ isAdmin }) => {
         .select("id, full_name");
       if (error) throw error;
       setProfiles(data || []);
-    } catch (err) {
-      console.error(err);
+    } catch {
       showToast("Error fetching profiles", "error");
     }
   };
 
-const fetchAttendance = async () => {
-  setLoading(true);
+  const fetchAttendance = async () => {
+    setLoading(true);
+    try {
+      const today = new Date();
+      const start = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
+      const end = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59).toISOString();
 
-  try {
-    const today = new Date();
-    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
-    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999).toISOString();
+      let query = supabase
+        .from("attendance")
+        .select("*")
+        .gte("check_in", start)
+        .lte("check_in", end)
+        .order("check_in", { ascending: false });
 
-    let query = supabase
-      .from("attendance")
-      .select("*")
-      .gte("check_in", startOfDay)
-      .lte("check_in", endOfDay)
-      .order("check_in", { ascending: false });
+      if (!isAdmin && userId) query = query.eq("user_id", userId);
 
-    // For regular users, filter by their userId
-    if (!isAdmin && userId) {
-      query = query.eq("user_id", userId);
+      const { data, error } = await query;
+      if (error) throw error;
+
+      setAttendance(
+        data.map((att) => ({
+          ...att,
+          full_name: profiles.find((p) => p.id === att.user_id)?.full_name || "Unknown",
+        }))
+      );
+    } catch {
+      showToast("Error fetching attendance", "error");
+    } finally {
+      setLoading(false);
     }
-
-    const { data, error } = await query;
-    if (error) throw error;
-
-    const mappedData = data.map((att) => {
-      const profile = profiles.find((p) => p.id === att.user_id);
-      return {
-        ...att,
-        full_name: profile?.full_name || "Unknown",
-      };
-    });
-
-    setAttendance(mappedData);
-  } catch (err) {
-    console.error(err);
-    showToast("Error fetching attendance", "error");
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   useEffect(() => {
     fetchUser();
@@ -111,15 +100,15 @@ const fetchAttendance = async () => {
   }, []);
 
   useEffect(() => {
-    if (profiles.length > 0 && userId) fetchAttendance();
+    if (profiles.length && userId) fetchAttendance();
   }, [profiles, userId]);
 
   const handleCheckIn = async () => {
     if (!userId) return;
-    const today = new Date().toISOString().split("T")[0];
 
+    const today = new Date().toISOString().split("T")[0];
     try {
-      const { data: existing, error } = await supabase
+      const { data: existing } = await supabase
         .from("attendance")
         .select("*")
         .eq("user_id", userId)
@@ -127,26 +116,18 @@ const fetchAttendance = async () => {
         .lte("check_in", `${today}T23:59:59Z`)
         .maybeSingle();
 
-      if (error) throw error;  
-      if (existing) return showToast("You have already checked in today!", "error");
+      if (existing) return showToast("Already checked in today", "error");
 
       setLoading(true);
-      const { error: insertError } = await supabase.from("attendance").insert([
-        {
-          user_id: userId,
-          check_in: new Date().toISOString(),
-          note: note || null,
-        },
+      await supabase.from("attendance").insert([
+        { user_id: userId, check_in: new Date().toISOString(), note: note || null },
       ]);
 
-      if (insertError) throw insertError;
-
-      fetchAttendance();
-      showToast("Checked in successfully!");
       setNote("");
-    } catch (err) {
-      console.error(err);
-      showToast("Error during check-in", "error");
+      fetchAttendance();
+      showToast("Check-in successful");
+    } catch {
+      showToast("Check-in failed", "error");
     } finally {
       setLoading(false);
     }
@@ -155,82 +136,100 @@ const fetchAttendance = async () => {
   const handleCheckOut = async (id) => {
     try {
       setLoading(true);
-      const { error } = await supabase
+      await supabase
         .from("attendance")
         .update({ check_out: new Date().toISOString() })
         .eq("id", id);
 
-      if (error) throw error;
       fetchAttendance();
-      showToast("Checked out successfully!");
-    } catch (err) {
-      console.error(err);
-      showToast("Error during check-out", "error");
+      showToast("Checked out successfully");
+    } catch {
+      showToast("Check-out failed", "error");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-6 bg-white rounded shadow-md">
-      {toast && <Toast message={toast.message} type={toast.type} />}
-      <h2 className="text-3xl font-semibold mb-6 text-black-700">Attendance Sheet</h2>
+    <div className="bg-white rounded-2xl shadow-lg p-6 space-y-6">
+      {toast && <Toast {...toast} />}
+
+      <header className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-800">Attendance</h2>
+        <span className="text-sm text-gray-500">
+          {new Date().toDateString()}
+        </span>
+      </header>
 
       {!isAdmin && (
-        <div className="mb-6">
+        <div className="bg-gray-50 border rounded-xl p-4 space-y-3">
           <textarea
-            placeholder="Optional note"
+            placeholder="Optional note for today..."
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            className="border p-3 w-full mb-3 rounded focus:outline-green-500"
+            className="w-full p-3 rounded-lg border focus:ring-2 focus:ring-emerald-500 outline-none resize-none"
           />
-          <div className="flex gap-3">
-            <button
-              onClick={handleCheckIn}
-              disabled={loading}
-              className="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 transition"
-            >
-              Check-In
-            </button>
-          </div>
+          <button
+            onClick={handleCheckIn}
+            disabled={loading}
+            className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white px-6 py-2 rounded-lg font-medium transition"
+          >
+            {loading ? "Processing..." : "Check In"}
+          </button>
         </div>
       )}
 
-      {loading && <p className="text-green-600 font-semibold">Loading...</p>}
-
-      <table className="w-full border-collapse border border-green-400 text-center">
-        <thead>
-          <tr className="bg-green-100">
-            <th className="border p-2">Employee</th>
-            <th className="border p-2">Date</th>
-            <th className="border p-2">Check-In</th>
-            <th className="border p-2">Check-Out</th>
-            <th className="border p-2">Note</th>
-            {!isAdmin && <th className="border p-2">Action</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {attendance.map((att) => (
-            <tr key={att.id} className="hover:bg-green-50">
-              <td className="border p-2">{att.full_name}</td>
-              <td className="border p-2">{att.check_in ? new Date(att.check_in).toLocaleDateString() : "-"}</td>
-              <td className="border p-2">{att.check_in ? new Date(att.check_in).toLocaleTimeString() : "-"}</td>
-              <td className="border p-2">{att.check_out ? new Date(att.check_out).toLocaleTimeString() : "-"}</td>
-              <td className="border p-2">{att.note || "-"}</td>
-              {!isAdmin && att.check_in && !att.check_out && (
-                <td className="border p-2">
-                  <button
-                    onClick={() => handleCheckOut(att.id)}
-                    className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition"
-                  >
-                    Check-Out
-                  </button>
-                </td>
-              )}
+      <div className="overflow-x-auto rounded-xl border">
+        <table className="w-full text-sm">
+          <thead className="bg-emerald-50 text-emerald-800">
+            <tr>
+              <th className="p-3 text-left">Employee</th>
+              <th className="p-3">Date</th>
+              <th className="p-3">Check In</th>
+              <th className="p-3">Check Out</th>
+              <th className="p-3">Note</th>
+              {!isAdmin && <th className="p-3">Action</th>}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {attendance.length === 0 && !loading && (
+              <tr>
+                <td colSpan="6" className="text-center p-6 text-gray-500">
+                  No attendance records today
+                </td>
+              </tr>
+            )}
+
+            {attendance.map((att) => (
+              <tr
+                key={att.id}
+                className="border-t hover:bg-gray-50 transition"
+              >
+                <td className="p-3 font-medium">{att.full_name}</td>
+                <td className="p-3">{new Date(att.check_in).toLocaleDateString()}</td>
+                <td className="p-3">{new Date(att.check_in).toLocaleTimeString()}</td>
+                <td className="p-3">
+                  {att.check_out
+                    ? new Date(att.check_out).toLocaleTimeString()
+                    : "—"}
+                </td>
+                <td className="p-3 text-gray-600">{att.note || "—"}</td>
+
+                {!isAdmin && att.check_in && !att.check_out && (
+                  <td className="p-3">
+                    <button
+                      onClick={() => handleCheckOut(att.id)}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-lg transition"
+                    >
+                      Check Out
+                    </button>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
