@@ -100,7 +100,7 @@ const NotificationList = () => {
   return (
     <div className="p-6 bg-white rounded shadow-md min-h-screen">
       {toast && <Toast message={toast.message} type={toast.type} />}
-      <h2 className="text-3xl font-bold mb-6 text-black-600">Your Notifications</h2>
+      <h2 className="text-3xl font-bold mb-6 text-emerald-900">Your Notifications</h2>
 
       {loading && <p className="text-black-600 font-semibold">Loading...</p>}
 
